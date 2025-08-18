@@ -48,11 +48,11 @@ func main() {
 
 	app := fiber.New()
 
-	app.Get("/", get)
-	app.Get("/:id", getOne)
-	app.Post("/", create)
-	app.Patch("/:id", update)
-	app.Delete("/:id", delete)
+	app.Get("/api/", get)
+	app.Get("/api/:id", getOne)
+	app.Post("/api/", create)
+	app.Patch("/api/:id", update)
+	app.Delete("/api/:id", delete)
 
 
 	port := os.Getenv("PORT")
@@ -129,14 +129,18 @@ func create(c *fiber.Ctx) error {
 
 func update(c *fiber.Ctx) error {
 	id := c.Params("id")
-
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid ID"})
 	}
 
+	todo := new(Todo)
+	if err := c.BodyParser(todo); err != nil {
+		return err
+	}
+
 	filter := bson.M{"_id": objectId}
-	update := bson.M{"$set": bson.M{"completed": true}}
+	update := bson.M{"$set": bson.M{"completed": todo.Completed, "body": todo.Body}}
 
 	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {

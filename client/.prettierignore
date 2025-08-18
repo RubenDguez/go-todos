@@ -1,0 +1,9 @@
+node_modules/
+public/
+.ignore
+eslint*.js
+index.html
+package*.json
+README.md
+tsconfig*.json
+vite*.ts
